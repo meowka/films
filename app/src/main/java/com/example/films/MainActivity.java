@@ -6,18 +6,53 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+
+
+public class MainActivity extends AppCompatActivity implements FragmentList.ClickListener {
+    private static final String BACK_STACK_ROOT_TAG = "root_fragment";
+    FragmentManager fragmentManager;
+    FragmentTransaction fragmentTransaction;
+    FragmentList fragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FragmentList fragment = new FragmentList();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.container, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+
+        if (savedInstanceState == null) {
+            fragment = new FragmentList();
+            fragmentManager = getSupportFragmentManager();
+            fragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.container, fragment);
+            fragmentTransaction.addToBackStack(BACK_STACK_ROOT_TAG);
+            fragmentTransaction.commit();
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        int fragmentsInStack = getSupportFragmentManager().getBackStackEntryCount();
+        if (fragmentsInStack > 1) { // If we have more than one fragment, pop back stack
+            getSupportFragmentManager().popBackStack();
+        } else if (fragmentsInStack == 1) { // Finish activity, if only one fragment left, to prevent leaving empty screen
+            finish();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void ClickListenerFragment() {
+            fragment = new FragmentList();
+            fragmentManager = getSupportFragmentManager();
+            fragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.container, fragment);
+            fragmentTransaction.addToBackStack(BACK_STACK_ROOT_TAG);
+            fragmentTransaction.commit();
     }
 }

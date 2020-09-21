@@ -18,7 +18,7 @@ public class Films {
         this.films = films;
     }
 
-    public class ApiResponse {
+    public static class ApiResponse implements Comparable<ApiResponse> {
         @SerializedName("id")
         @Expose
         public Integer id;
@@ -106,6 +106,12 @@ public class Films {
 
         public void setGenres(List<String> genres) {
             this.genres = genres;
+        }
+
+        @Override
+        public int compareTo(ApiResponse apiResponse) {
+
+            return  localizedName.compareTo(apiResponse.localizedName);
         }
     }
 }

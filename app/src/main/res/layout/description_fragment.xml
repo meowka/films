@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/des_activ">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/my_toolbar_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#6936D6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:id="@+id/txt_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:fontFamily="@font/roboto"
+            android:maxLines="1"
+            android:ellipsize="end">
+        </TextView>
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="132dp"
+        android:layout_height="201dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar_description"
+        android:layout_marginTop="24dp"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/ic_launcher_foreground" />
+    <TextView
+        android:id="@+id/nameFilmDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="26sp"
+        android:fontFamily="@font/roboto_bold"
+        android:lineHeight="32sp"
+        android:textColor="#000000"
+        android:text="nameFilm1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+
+    <TextView
+        android:id="@+id/genreFilmDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        android:fontFamily="@font/roboto"
+        android:lineHeight="20sp"
+        android:textColor="#4B4B4B"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameFilmDescription" />
+
+    <TextView
+        android:id="@+id/ratingFilmsDesription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:textSize="24sp"
+        android:fontFamily="@font/roboto_bold"
+        android:lineHeight="20sp"
+        android:textColor="#6936D6"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/genreFilmDescription" />
+
+    <TextView
+        android:id="@+id/descriptionFilmsDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="14sp"
+        android:fontFamily="@font/roboto"
+        android:lineHeight="20sp"
+        android:textColor="#000000"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.047"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ratingFilmsDesription" />
+
+    <TextView
+        android:id="@+id/kinoPoisk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/roboto"
+        android:lineHeight="18sp"
+        android:text="TextView"
+        android:textColor="#6936D6"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/ratingFilmsDesription"
+        app:layout_constraintStart_toEndOf="@+id/ratingFilmsDesription" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
