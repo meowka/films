@@ -27,6 +27,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,23 +52,14 @@ public class FragmentList extends Fragment {
     List<Object> setData;
 
 
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
-        showSnackbar(container);
         genre = new ArrayList<>();
+        setData = new ArrayList<>();
         progressBar = view.findViewById(R.id.progressBar);
-        try {
-            if (!isConnected()) {
-                progressBar.setVisibility(View.GONE);
-            }
-        } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
-        }
         final RecyclerView recyclerView = view.findViewById(R.id.RecyclerList);
         toolbar = view.findViewById(R.id.my_toolbar);
         activity = (AppCompatActivity) getActivity();
@@ -79,48 +71,61 @@ public class FragmentList extends Fragment {
 
         apiInterface = APIClient.getClient().create(APIInterface.class);
         Call<Films> call = apiInterface.doGetListResources();
-        call.enqueue(new Callback<Films>() {
-            @Override
-            public void onResponse(Call<Films> call, Response<Films> response) {
-                resource = response.body();
-                genreList(resource);
-                for (int i = 0; i < genre.size(); i++) {
-                    genre.set(i, genre.get(i).substring(0, 1).toUpperCase() + genre.get(i).substring(1));
+        if (savedInstanceState == null) {
+            call.enqueue(new Callback<Films>() {
+                @Override
+                public void onResponse(Call<Films> call, Response<Films> response) {
+                    resource = response.body();
+                    genreList(resource);
+                    for (int i = 0; i < genre.size(); i++) {
+                        genre.set(i, genre.get(i).substring(0, 1).toUpperCase() + genre.get(i).substring(1));
+                    }
+                    Collections.sort(resource.films);
+                    data = new ArrayList<>();
+                    genreHeader = new GenreHeader();
+                    filmsHeader = new FilmsHeader();
+//                    Collections.sort(genre);
+                    genreHeader.setGenreHeader("Жанры");
+                    filmsHeader.setFilmsHeader("Фильмы");
+                    data.add(genreHeader);
+                    data.addAll(genre);
+                    data.add(filmsHeader);
+                    data.addAll(resource.films);
+                    setData.addAll(data);
+                    if (getActivity() != null) {
+                        adapter = new FilmsAdapter(data, getActivity(), setData);
+                        recyclerView.setAdapter(adapter);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                    }
+                    Log.d("Tag", response.code() + "" + resource.films);
                 }
-                Collections.sort(resource.films);
-                data = new ArrayList<>();
-                genreHeader = new GenreHeader();
-                filmsHeader = new FilmsHeader();
-                Collections.sort(genre);
-                genreHeader.setGenreHeader("Жанры");
-                filmsHeader.setFilmsHeader("Фильмы");
-                data.add(genreHeader);
-                data.addAll(genre);
-                data.add(filmsHeader);
-                data.addAll(resource.films);
-                setData = new ArrayList<>();
-                setData.addAll(data);
-                if (getActivity() != null) {
-                    adapter = new FilmsAdapter(data, getActivity(), setData);
-                    recyclerView.setAdapter(adapter);
-                    recyclerView.setVisibility(View.VISIBLE);
+                @Override
+                public void onFailure(Call<Films> call, Throwable t) {
+                    Log.d("Tag", "Error");
                     progressBar.setVisibility(View.GONE);
+                    showSnackbar(container);
+                    call.cancel();
                 }
-                Log.d("Tag", response.code() + "" + resource.films);
-            }
-
-            @Override
-            public void onFailure(Call<Films> call, Throwable t) {
-                Log.d("Tag", "Error");
-                call.cancel();
-            }
-        });
+            });
+        } else {
+            data = (List<Object>) savedInstanceState.getSerializable("data");
+            setData = (List<Object>) savedInstanceState.getSerializable("setData");
+            adapter = new FilmsAdapter(data, getActivity(), setData);
+            recyclerView.setAdapter(adapter);
+            recyclerView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            adapter.setCopyGenre(savedInstanceState.getString("copyGenre"));
+        }
         return view;
     }
 
-    public boolean isConnected() throws InterruptedException, IOException {
-        final String command = "ping -c 1 google.com";
-        return Runtime.getRuntime().exec(command).waitFor() == 0;
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("data", (Serializable) data);
+        outState.putSerializable("setData", (Serializable) setData);
+        outState.putString("copyGenre", adapter.copyGenre);
     }
 
     private void genreList(Films resource) {
@@ -138,29 +143,16 @@ public class FragmentList extends Fragment {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private void showSnackbar(final ViewGroup container) {
-        try {
-            if (!isConnected()) {
-                snackbar = Snackbar.make(container, "Ошибка подключения к сети", Snackbar.LENGTH_INDEFINITE).setAction("Повторить", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        try {
-                            if (!isConnected()) {
-                                showSnackbar(container);
-                            } else {
-                                listener.ClickListenerFragment();
-                            }
-                        } catch (InterruptedException | IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                snackbar.setActionTextColor(Color.parseColor("#A77DFF"));
-                snackbar.getView().setBackground(getResources().getDrawable(R.drawable.container_snackbar));
-                snackbar.show();
+        snackbar = Snackbar.make(container, "Ошибка подключения к сети", Snackbar.LENGTH_INDEFINITE).setAction("Повторить", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.ClickListenerFragment();
             }
-        } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
-        }
+        });
+        snackbar.setActionTextColor(Color.parseColor("#A77DFF"));
+        snackbar.getView().setBackground(getResources().getDrawable(R.drawable.container_snackbar));
+        snackbar.show();
+
     }
 
     @Override
@@ -179,20 +171,6 @@ public class FragmentList extends Fragment {
 
     }
 
-    public FragmentList Filter(String link) {
-            for (int i = 0; i < resource.films.size(); i++) {
-                if (resource.films.get(i).genres.contains(link.toLowerCase())) {
-                    List<Films.ApiResponse> list = new ArrayList<>();
-                    list.add(resource.films.get(i));
-                    data.addAll(list);
-                    adapter.notifyDataSetChanged();
-                }
-        else {
-                    data.addAll(resource.films);
-                }
-        }
-        return null;
-    }
 
     public interface ClickListener {
         void ClickListenerFragment();

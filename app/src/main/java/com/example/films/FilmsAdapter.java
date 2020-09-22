@@ -89,6 +89,8 @@ public class FilmsAdapter extends RecyclerView.Adapter {
     List<Object> list;
     List<Object> setData;
     String copyGenre = "";
+    int pos;
+    int a;
 
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
@@ -108,106 +110,60 @@ public class FilmsAdapter extends RecyclerView.Adapter {
         if (viewType == TYPE_FILM) {
             view = inflater.inflate(R.layout.item_list, parent, false);
             final FilmsViewHolder viewHolder = new FilmsViewHolder(view);
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int a = viewHolder.getAdapterPosition();
-                    if (getItemViewType(viewHolder.getAdapterPosition()) == TYPE_FILM) {
-                        f = (Films.ApiResponse) data.get(viewHolder.getAdapterPosition());
-                        if (a != RecyclerView.NO_POSITION) {
-                            FragmentDescription fd = new FragmentDescription();
-                            Bundle bundle = new Bundle();
-                            bundle.putString("name", f.localizedName);
-                            if (f.genres.size() == 0) {
-                                bundle.putString("genre", String.valueOf(f.year));
-                            } else {
-                                bundle.putString("genre", (f.genres.toString().replace("[", "").replace("]", "")) + ", " + f.year);
-                            }
-                            bundle.putString("description", f.description);
-                            if (f.rating == null) {
-                                bundle.putString("rating", ("--"));
-                            } else {
-                                bundle.putString("rating", (f.rating.toString().substring(0, 3)));
-                            }
-                            bundle.putString("image", String.valueOf(f.imageUrl));
-                            bundle.putString("nameBar", f.name);
-                            fd.setArguments(bundle);
-                            AppCompatActivity activity = (AppCompatActivity) view.getContext();
-                            fragmentManager = activity.getSupportFragmentManager();
-                            fragmentTransaction = fragmentManager.beginTransaction();
-                            fragmentTransaction.replace(R.id.container, fd);
-                            fragmentTransaction.addToBackStack(null);
-                            fragmentTransaction.commit();
-                        }
-                    }
-                }
-            });
+             a = viewHolder.getAdapterPosition();
             return viewHolder;
         } else if (viewType == TYPE_GENRE_HEADER) {
             view = inflater.inflate(R.layout.ittem_genre_header, parent, false);
+            final ViewGroup.LayoutParams lp = view.getLayoutParams();
+            setFullSpan(view);
             return new GenreHeaderViewHolder(view);
         } else if (viewType == TYPE_FILM_HEADER) {
             view = inflater.inflate(R.layout.ittem_films_header, parent, false);
-            final ViewGroup.LayoutParams lp = view.getLayoutParams();
-            if (lp instanceof StaggeredGridLayoutManager.LayoutParams) {
-                StaggeredGridLayoutManager.LayoutParams sglp = (StaggeredGridLayoutManager.LayoutParams) lp;
-                sglp.setFullSpan(true);
-            }
+            setFullSpan(view);
             return new FilmHeaderViewHolder(view);
         } else {
             view = inflater.inflate(R.layout.genrelist, parent, false);
             final GenreViewHolder genreViewHolder = new GenreViewHolder(view);
-            final ViewGroup.LayoutParams lp = view.getLayoutParams();
-            if (lp instanceof StaggeredGridLayoutManager.LayoutParams) {
-                StaggeredGridLayoutManager.LayoutParams sglp = (StaggeredGridLayoutManager.LayoutParams) lp;
-                sglp.setFullSpan(true);
-            }
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        int pos = genreViewHolder.getAdapterPosition();
-                        genre = (String) data.get(pos);
-                        if (pos != RecyclerView.NO_POSITION) {
-                            if (genre.equals(copyGenre)) {
-                                copyGenre= "";
-                                data.clear();
-                                data.addAll(setData);
-                            } else {
-                                copyGenre = genre;
-                                list = new ArrayList<>();
-                                for (int i = 0; i < setData.size(); i++) {
-                                    if (setData.get(i) instanceof GenreHeader) {
-                                        list.add(setData.get(i));
-                                    } else if (setData.get(i) instanceof String) {
-                                        list.add(setData.get(i));
-                                    } else if (setData.get(i) instanceof FilmsHeader) {
-                                        list.add(setData.get(i));
-                                    }
-                                    if (setData.get(i) instanceof Films.ApiResponse)
-                                        if (((Films.ApiResponse) setData.get(i)).genres.contains(genre.toLowerCase())) {
-                                            list.add(setData.get(i));
-                                        }
-                                }
-                                data.clear();
-                                data.addAll(list);
-                            }
-                            notifyDataSetChanged();
-                        }
-
-                    }
-                });
-
+            setFullSpan(view);
             return genreViewHolder;
         }
     }
 
-    @SuppressLint("WrongConstant")
+    @SuppressLint({"WrongConstant", "ResourceAsColor"})
     @Override
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
         if (getItemViewType(position) == TYPE_FILM) {
             filmsItem = (Films.ApiResponse) data.get(position);
             ((FilmsViewHolder) holder).nameFilm.setText(((Films.ApiResponse) data.get(position)).localizedName);
             Picasso.get().load((String.valueOf(filmsItem.imageUrl))).placeholder(R.drawable.placeholder).into(((FilmsViewHolder) holder).imgFilms);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FragmentDescription fd = new FragmentDescription();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("name", ((Films.ApiResponse) data.get(position)).localizedName);
+                    if (filmsItem.genres.size() == 0) {
+                        bundle.putString("genre", String.valueOf(((Films.ApiResponse) data.get(position)).year));
+                    } else {
+                        bundle.putString("genre", (((Films.ApiResponse) data.get(position)).genres.toString().replace("[", "").replace("]", "")) + ", " + ((Films.ApiResponse) data.get(position)).year);
+                    }
+                    bundle.putString("description", ((Films.ApiResponse) data.get(position)).description);
+                    if (((Films.ApiResponse) data.get(position)).rating == null) {
+                        bundle.putString("rating", ("--"));
+                    } else {
+                        bundle.putString("rating", (((Films.ApiResponse) data.get(position)).rating.toString().substring(0, 3)));
+                    }
+                    bundle.putString("image", String.valueOf(((Films.ApiResponse) data.get(position)).imageUrl));
+                    bundle.putString("nameBar", ((Films.ApiResponse) data.get(position)).name);
+                    fd.setArguments(bundle);
+                    AppCompatActivity activity = (AppCompatActivity) view.getContext();
+                    fragmentManager = activity.getSupportFragmentManager();
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.container, fd);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+            });
         } else if (getItemViewType(position) == TYPE_GENRE_HEADER) {
             genreHeader = (GenreHeader) data.get(position);
             ((GenreHeaderViewHolder) holder).genreHeaderFilms.setText(String.valueOf(genreHeader.genreHeader));
@@ -217,9 +173,46 @@ public class FilmsAdapter extends RecyclerView.Adapter {
         } else if (getItemViewType(position) == TYPE_GENRE) {
             genreItem = (String) data.get(position);
             ((GenreViewHolder) holder).genreFilms.setText(genreItem);
+            if (data.get(position).equals(copyGenre)){
+                holder.itemView.setBackgroundColor(R.color.genreItem);
+                click = true;
+            }else holder.itemView.setBackgroundColor(0);
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (data.get(position).equals(copyGenre)) {
+                            copyGenre= "";
+                            data.clear();
+                            data.addAll(setData);
+                        } else {
+                            copyGenre = (String) data.get(position);
+                            list = new ArrayList<>();
+                            for (int i = 0; i < setData.size(); i++) {
+                                if (setData.get(i) instanceof GenreHeader) {
+                                    list.add(setData.get(i));
+                                } else if (setData.get(i) instanceof String) {
+                                    list.add(setData.get(i));
+                                } else if (setData.get(i) instanceof FilmsHeader) {
+                                    list.add(setData.get(i));
+                                }
+                                if (setData.get(i) instanceof Films.ApiResponse)
+                                    if (((Films.ApiResponse) setData.get(i)).genres.contains(((String) data.get(position)).toLowerCase())) {
+                                        list.add(setData.get(i));
+                                    }
+                            }
+                            data.clear();
+                            data.addAll(list);
+                        }
+                    notifyDataSetChanged();
+                    }
+                });
+
         }
     }
 
+    public void setCopyGenre(String copyGenre) {
+        this.copyGenre = copyGenre;
+    }
 
     @Override
     public int getItemViewType(int position) {
@@ -240,10 +233,13 @@ public class FilmsAdapter extends RecyclerView.Adapter {
         return data.size();
     }
 
-    void setFilter() {
-
+    void setFullSpan(View view){
+        final ViewGroup.LayoutParams lp = view.getLayoutParams();
+        if (lp instanceof StaggeredGridLayoutManager.LayoutParams) {
+            StaggeredGridLayoutManager.LayoutParams sglp = (StaggeredGridLayoutManager.LayoutParams) lp;
+            sglp.setFullSpan(true);
+        }
     }
-
 }
 
 

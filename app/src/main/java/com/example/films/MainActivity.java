@@ -19,18 +19,17 @@ public class MainActivity extends AppCompatActivity implements FragmentList.Clic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         if (savedInstanceState == null) {
             fragment = new FragmentList();
             fragmentManager = getSupportFragmentManager();
             fragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.container, fragment);
+            fragmentTransaction.replace(R.id.container, fragment, BACK_STACK_ROOT_TAG);
             fragmentTransaction.addToBackStack(BACK_STACK_ROOT_TAG);
             fragmentTransaction.commit();
+        }else {
+            fragment = (FragmentList) getSupportFragmentManager().findFragmentByTag(BACK_STACK_ROOT_TAG);
         }
-
     }
 
     @Override

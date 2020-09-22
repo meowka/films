@@ -49,6 +49,7 @@ public class FragmentDescription extends Fragment {
             myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     getActivity().onBackPressed();
                 }
             });
